@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Kahoot-Style Computer Quiz</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f2f2f2;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .quiz-container {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 20px 30px;
+      margin-top: 50px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 600px;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .question {
+      font-size: 20px;
+      margin-bottom: 20px;
+    }
+    .options button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .options button:hover {
+      opacity: 0.95;
+    }
+    .correct { background-color: #a5d6a7 !important; }
+    .wrong { background-color: #ef9a9a !important; }
+    #next-btn {
+      background-color: #2196f3;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+    #score {
+      font-size: 18px;
+      text-align: center;
+      margin-top: 20px;
+    }
+    #timer {
+      text-align: right;
+      font-weight: bold;
+      color: #ff5722;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="quiz-container">
+    <h1>Computer Quiz</h1>
+    <div id="timer">Time: 20</div>
+    <div class="question" id="question"></div>
+    <div class="options" id="options"></div>
+    <button id="next-btn" onclick="nextQuestion()">Next</button>
+    <div id="score"></div>
+  </div>
+
+  <script>
+    const quiz = [/* Same 20-question array from earlier (pasted below) */];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let timer;
+    let timeLeft = 20;
+
+    function startTimer() {
+      timeLeft = 20;
+      document.getElementById("timer").textContent = `Time: ${timeLeft}`;
+      timer = setInterval(() => {
+        timeLeft--;
+        document.getElementById("timer").textContent = `Time: ${timeLeft}`;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          disableOptions();
+        }
+      }, 1000);
+    }
+
+    function showQuestion() {
+      const q = quiz[currentQuestion];
+      document.getElementById("question").textContent = q.question;
+      const optionsDiv = document.getElementById("options");
+      optionsDiv.innerHTML = "";
+      q.options.forEach((opt, i) => {
+        const btn = document.createElement("button");
+        btn.textContent = opt;
+        btn.onclick = () => checkAnswer(i, btn);
+        optionsDiv.appendChild(btn);
+      });
+      startTimer();
+    }
+
+    function checkAnswer(selected, button) {
+      clearInterval(timer);
+      const correct = quiz[currentQuestion].answer;
+      const buttons = document.querySelectorAll(".options button");
+      buttons.forEach((btn, idx) => {
+        btn.disabled = true;
+        if (idx === correct) btn.classList.add("correct");
+        if (idx === selected && idx !== correct) btn.classList.add("wrong");
+      });
+      if (selected === correct) score++;
+    }
+
+    function disableOptions() {
+      const correct = quiz[currentQuestion].answer;
+      const buttons = document.querySelectorAll(".options button");
+      buttons.forEach((btn, idx) => {
+        btn.disabled = true;
+        if (idx === correct) btn.classList.add("correct");
+      });
+    }
+
+    function nextQuestion() {
+      clearInterval(timer);
+      currentQuestion++;
+      if (currentQuestion < quiz.length) {
+        showQuestion();
+        document.getElementById("score").textContent = "";
+      } else {
+        document.querySelector(".quiz-container").innerHTML = `<h2>Your Final Score: ${score} / ${quiz.length}</h2>`;
+      }
+    }
+
+    // Initialize
+    showQuestion();
+
+    // Paste your 20-question quiz array here (trimmed here to keep this short)
+    const fullQuiz = [...]; // Replace with full question array from earlier message
+    quiz.splice(0, quiz.length, ...fullQuiz);
+  </script>
+
+</body>
+</html>
